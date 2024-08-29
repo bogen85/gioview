@@ -3,7 +3,6 @@ package main
 import (
 	//"image"
 	"image/color"
-	"log"
 	"regexp"
 
 	"github.com/oligo/gioview/editor"
@@ -39,6 +38,12 @@ func (vw *EditorExample) Title() string {
 }
 
 func (vw *EditorExample) Layout(gtx layout.Context, th *theme.Theme) layout.Dimensions {
+	errString := ""
+	styles, err := stylingText(vw.ed.Text(), vw.patternInput.Text())
+	if err != nil {
+		errString = err.Error()
+	}
+
 	return layout.Flex{
 		Axis:      layout.Vertical,
 		Alignment: layout.Middle,
@@ -48,6 +53,11 @@ func (vw *EditorExample) Layout(gtx layout.Context, th *theme.Theme) layout.Dime
 			return material.Label(th.Theme, th.TextSize, "Editor with text highlighting example").Layout(gtx)
 		}),
 		layout.Rigid(layout.Spacer{Height: unit.Dp(20)}.Layout),
+
+		// status label, need to make it red for an error?
+		layout.Rigid(func(gtx C) D {
+			return material.Label(th.Theme, th.TextSize, errString).Layout(gtx)
+		}),
 
 		layout.Rigid(func(gtx C) D {
 			vw.patternInput.Padding = unit.Dp(8)
@@ -73,7 +83,7 @@ func (vw *EditorExample) Layout(gtx layout.Context, th *theme.Theme) layout.Dime
 				LineNumPadding:     unit.Dp(24),
 			}
 
-			vw.ed.UpdateTextStyles(stylingText(vw.ed.Text(), vw.patternInput.Text()))
+			vw.ed.UpdateTextStyles(styles)
 
 			return layout.Inset{
 				Left:  unit.Dp(10),
@@ -109,13 +119,12 @@ func colorToOp(textColor color.NRGBA) op.CallOp {
 	return m.Stop()
 }
 
-func stylingText(text string, pattern string) []*editor.TextStyle {
+func stylingText(text string, pattern string) ([]*editor.TextStyle, error) {
 	var styles []*editor.TextStyle
 
 	re, err := regexp.Compile(pattern)
 	if err != nil {
-	log.Println(err)
-		return styles
+		return styles, err
 	}
 	matches := re.FindAllIndex([]byte(text), -1)
 	for _, match := range matches {
@@ -127,7 +136,7 @@ func stylingText(text string, pattern string) []*editor.TextStyle {
 		})
 	}
 
-	return styles
+	return styles, err
 }
 
 var sampleText = `
