@@ -2,8 +2,8 @@ package main
 
 import (
 	//"image"
-
 	"image/color"
+	"log"
 	"regexp"
 
 	"github.com/oligo/gioview/editor"
@@ -112,7 +112,11 @@ func colorToOp(textColor color.NRGBA) op.CallOp {
 func stylingText(text string, pattern string) []*editor.TextStyle {
 	var styles []*editor.TextStyle
 
-	re := regexp.MustCompile(pattern)
+	re, err := regexp.Compile(pattern)
+	if err != nil {
+	log.Println(err)
+		return styles
+	}
 	matches := re.FindAllIndex([]byte(text), -1)
 	for _, match := range matches {
 		styles = append(styles, &editor.TextStyle{
@@ -128,6 +132,7 @@ func stylingText(text string, pattern string) []*editor.TextStyle {
 
 var sampleText = `
 Gio-view is a third-party toolkit that simplifies building user interfaces (UIs) for desktop applications written with the Gio library in Go.
-It provides pre-built components and widgets, saving you time and effort compared to creating everything from scratch. Gio-view offers a 
+It provides pre-built components and widgets, saving you time and effort compared to creating everything from scratch. Gio-view offers a
 more user-friendly experience for developers new to Gio.
 `
+// CudaText: lexer_file="Go"; tab_size=4; tab_spaces=No;

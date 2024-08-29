@@ -3,6 +3,7 @@ package main
 import (
     "image/color"
     "os"
+    "log"
 
     "github.com/oligo/gioview/theme"
 
@@ -49,6 +50,7 @@ func (ui *UI) layout(gtx C) D {
 }
 
 func main() {
+    log.SetFlags(log.LstdFlags | log.Lshortfile)
     //defer profile.Start(profile.MemProfile).Stop()
 
     go func() {
@@ -68,3 +70,4 @@ func main() {
     app.Main()
 
 }
+// CudaText: lexer_file="Go"; tab_size=4; tab_spaces=Yes;
